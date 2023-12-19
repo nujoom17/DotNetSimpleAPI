@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace WebApplicationTest.Controllers
@@ -45,6 +46,16 @@ namespace WebApplicationTest.Controllers
 
             return _rootRepo.GetUserById(guidParsed);
 
+        }
+
+        [HttpDelete("delete-user/{guid}")]
+        public bool DeleteUser(string guid)
+        {
+            if (Guid.TryParse(guid, out Guid guidParsed) == false)
+            {
+                throw new Exception("GUID format is invalid");
+            }
+            return _rootRepo.DeleteUser(guidParsed);
         }
 
 

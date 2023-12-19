@@ -30,6 +30,11 @@ public class RootRepository : IRootRepository
     {
         var user = _context.Users.FirstOrDefault(x => x.Guid == guid);
 
+        if(user == null)
+        {
+            throw new Exception("User profile not found");
+        }
+
         var userData = new UserUpdateDto
         {
             FirstName = user.FirstName,
@@ -49,7 +54,7 @@ public class RootRepository : IRootRepository
 
         if (existingUser == null || payloadData?.Guid == null)
         {
-            throw new Exception("The user corresponding to the unique identifier is non-existent or invalid"); 
+            throw new Exception("The user corresponding to the unique identifier is non-existent"); 
         }
 
         foreach (PropertyInfo property in payloadData.GetType().GetProperties())
@@ -145,13 +150,30 @@ public class RootRepository : IRootRepository
     }
 
 
+    public bool DeleteUser(Guid guidParsed)
+    {
+        var user = _context.Users.FirstOrDefault(x=>x.Guid==guidParsed);
+
+        if (user == null)
+        {
+            return false;
+        }
+
+        // Remove the user from the database
+        _context.Users.Remove(user);
+        _context.SaveChanges();
+
+        return true;
+    }
+
     // Implement other CRUD operations
- }
+}
 
 
 public interface IRootRepository
 {
     Task<IEnumerable<UserModel>> CreateNewUser(UserModel payloadData);
+    bool DeleteUser(Guid guidParsed);
     Task<UserUpdateDto> EditUser(UserUpdateDto payload);
     IEnumerable<UserModel> GetAllUsers();
     UserUpdateDto GetUserById(Guid guid);
