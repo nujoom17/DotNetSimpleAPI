@@ -9,13 +9,11 @@ namespace WebApplicationTest.Controllers
     {
        
 
-        private readonly ILogger<WeatherForecastController> _logger;
         private readonly IRootRepository _rootRepo;
 
 
-        public RootController(ILogger<WeatherForecastController> logger,IRootRepository rootRepo)
+        public RootController(IRootRepository rootRepo)
         {
-            _logger = logger;
             _rootRepo = rootRepo;
         }
 
