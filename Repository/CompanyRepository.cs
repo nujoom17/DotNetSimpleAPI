@@ -33,7 +33,8 @@ public class CompanyRepository : ICompanyRepository
     public CompanyModel GetCompanyById(Guid guid)
     {
         var Company = _context.Companies.Select(CompanyEntity => _CompanyMapping.MapCompanyToCompanyModel(CompanyEntity)).
-            FirstOrDefault(x => x.Guid == guid);
+            Where(x=> x.Guid == guid).
+            FirstOrDefault();
 
         if (Company == null)
         {
