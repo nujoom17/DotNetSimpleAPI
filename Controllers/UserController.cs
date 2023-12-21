@@ -5,38 +5,38 @@ using System.Runtime.CompilerServices;
 namespace WebApplicationTest.Controllers
 {
     [ApiController]
-    [Route("root")]
-    public class RootController : ControllerBase
+    [Route("[controller]")]
+    public class UserController : ControllerBase
     {
        
 
-        private readonly IRootRepository _rootRepo;
+        private readonly IUserRepository _userRepo;
 
 
-        public RootController(IRootRepository rootRepo)
+        public UserController(IUserRepository userRepo)
         {
-            _rootRepo = rootRepo;
+            _userRepo = userRepo;
         }
 
-        [HttpGet("get-all-users")]
+        [HttpGet("get-all")]
         public IEnumerable<UserModel> GetAllUsers()
         {
-            return _rootRepo.GetAllUsers();
+            return _userRepo.GetAllUsers();
         }
 
-        [HttpPost("create-user")]
-        public Task<IEnumerable<UserModel>> CreateNewUser(UserModel payload)
+        [HttpPost("create")]
+        public Task<UserUpdateDto> CreateNewUser(UserUpdateDto payload)
         {
-            return _rootRepo.CreateNewUser(payload);
+            return _userRepo.CreateNewUser(payload);
         }
 
-        [HttpPatch("edit-user")]
+        [HttpPatch("edit")]
         public Task<UserUpdateDto> EditUser(UserUpdateDto payload)
         {
-            return _rootRepo.EditUser(payload);
+            return _userRepo.EditUser(payload);
         }
 
-        [HttpGet("user/{guid}")]
+        [HttpGet("{guid}")]
         public UserUpdateDto GetUserByGuid(string guid)
         {
             if (Guid.TryParse(guid, out Guid guidParsed)==false)
@@ -44,18 +44,18 @@ namespace WebApplicationTest.Controllers
                 throw new Exception("GUID format is invalid");
             }
 
-            return _rootRepo.GetUserById(guidParsed);
+            return _userRepo.GetUserById(guidParsed);
 
         }
 
-        [HttpDelete("delete-user/{guid}")]
+        [HttpDelete("delete/{guid}")]
         public bool DeleteUser(string guid)
         {
             if (Guid.TryParse(guid, out Guid guidParsed) == false)
             {
                 throw new Exception("GUID format is invalid");
             }
-            return _rootRepo.DeleteUser(guidParsed);
+            return _userRepo.DeleteUser(guidParsed);
         }
 
 

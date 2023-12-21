@@ -12,5 +12,7 @@ public class UserModel
 
     public Guid? Guid { get; set; }
 
+    public string? UserType { get; set; }
+
 
 }

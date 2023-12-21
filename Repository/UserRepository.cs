@@ -1,4 +1,5 @@
 ﻿// Interface
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Collections.Generic;
@@ -8,12 +9,12 @@ using WebApplicationTest.Mappings;
 
 
 // Repository
-public class RootRepository : IRootRepository
+public class UserRepository : IUserRepository
 {
     private readonly DbContextMain _context;
     public UserMapping _userMapping;
 
-    public RootRepository(DbContextMain context, UserMapping userMapping)
+    public UserRepository(DbContextMain context, UserMapping userMapping)
     {
         _context = context;
         _userMapping = userMapping;
@@ -21,7 +22,7 @@ public class RootRepository : IRootRepository
 
     public IEnumerable<UserModel> GetAllUsers()
     {
-        var userModels = _context.Users.Select(userEntity => _userMapping.MapUserToUserModel(userEntity)).ToList();
+        var userModels = _context.Users.Include(u => u.UserType).Select(userEntity => _userMapping.MapUserToUserModel(userEntity)).ToList();
 
         return userModels;
     }
@@ -42,7 +43,8 @@ public class RootRepository : IRootRepository
             Gender = user.Gender,
             DateOfBirth = user.DateOfBirth,
             Nationality = user.Nationality,
-            Guid = guid
+            Guid = guid,
+            UserType = user.UserType?.Type?.Trim()
         };
 
         return userData;
@@ -85,7 +87,7 @@ public class RootRepository : IRootRepository
     }
 
 
-        public async Task<IEnumerable<UserModel>> CreateNewUser(UserModel payloadData)
+        public async Task<UserUpdateDto> CreateNewUser(UserUpdateDto payloadData)
     {
 
         string key =  $"genTemplateUser@{_context.Users.Count()}";
@@ -107,11 +109,11 @@ public class RootRepository : IRootRepository
 
         User newUser = new User
         {
-            FirstName = payloadData.FullName?.Split(' ')?[0], // Assuming FullName contains both first and last name
-            LastName = payloadData.FullName?.Split(' ')?[1],
+            FirstName = payloadData.FirstName?.Trim(), // Assuming FullName contains both first and last name
+            LastName = payloadData.LastName?.Trim(),
             Gender = payloadData.Gender,
             DateOfBirth = payloadData.DateOfBirth,
-            Nationality = payloadData.NationalityPrimary,
+            Nationality = payloadData.Nationality,
             CreatedDate = DateTime.UtcNow,
             UpdatedDate = DateTime.UtcNow,
             Guid = newGuid
@@ -128,9 +130,7 @@ public class RootRepository : IRootRepository
             _context.Users.Add(newUser);
         }
 
-        await _context.SaveChangesAsync();
-
-        return GetAllUsers();
+        return GetUserById((Guid)newGuid);
 
     }
 
@@ -170,9 +170,9 @@ public class RootRepository : IRootRepository
 }
 
 
-public interface IRootRepository
+public interface IUserRepository
 {
-    Task<IEnumerable<UserModel>> CreateNewUser(UserModel payloadData);
+    Task<UserUpdateDto> CreateNewUser(UserUpdateDto payloadData);
     bool DeleteUser(Guid guidParsed);
     Task<UserUpdateDto> EditUser(UserUpdateDto payload);
     IEnumerable<UserModel> GetAllUsers();

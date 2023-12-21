@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using WebApplicationTest.Entities;
 
 public class User
 {
@@ -17,5 +18,10 @@ public class User
     public DateTime? UpdatedDate { get; set; }
 
     public Guid? Guid { get; set; }
+
+    public int? UserTypeId { get; set; }
+    public MSTR_UserType UserType { get; set; }
+
+    public List<UserProfessionCompany> UserProfessionCompanies { get; set; }
 
 }
